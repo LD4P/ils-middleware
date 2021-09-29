@@ -1,5 +1,5 @@
 """Converts PYMARC JSON to Symphony JSON"""
-
+import json
 
 def _get_subfields(subfields: dict) -> list:
     output = []
@@ -28,9 +28,12 @@ def _get_fields(field):
     return new_field
 
 
-def to_symphony_json(pymarc_json):
+def to_symphony_json(**kwargs):
+    task_instance = kwargs["task_instance"]
+    marc_raw_json = task_instance.xcom_pull(task_ids="marc_json_to_s3", key="marc_json")
+    pymarc_json = json.loads(marc_raw_json)
     record = {"standard": "MARC21", "type": "BIB", "fields": []}
     record["leader"] = pymarc_json.get("leader")
     for field in pymarc_json["fields"]:
         record["fields"].append(_get_fields(field))
-    return record
+    return { "symphony_json": json.dumps(record) }

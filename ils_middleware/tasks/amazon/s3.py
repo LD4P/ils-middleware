@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
@@ -28,11 +29,13 @@ def send_to_s3(**kwargs) -> None:
         "sinopia-marc-development",
         replace=True,
     )
+    # Cheat to get the JSON into XCOM
+    return { "marc_json": json.dumps(marc_record.as_json()) }
 
 
 def get_temp_instances(task_instance):
     """Returns the temp file location from the prior task"""
-    return task_instance.xcom_pull(task_ids="process_symphony.download_symphony_marc")
+    return task_instance.xcom_pull(task_ids="process_symphony.download_marc")
 
 
 def marc_record_from_temp_file(instance):
