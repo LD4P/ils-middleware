@@ -13,7 +13,6 @@ from ils_middleware.tasks.symphony.mod_json import to_symphony_json
 
 from airflow import DAG
 from airflow.models import Variable
-from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
@@ -96,8 +95,13 @@ with DAG(
             token="{{ task_instance.xcom_pull(key='message', task_ids=['listen'])[0]}}",
         )
 
-        run_rdf2marc >> download_marc  >> export_marc_json >> convert_to_symphony_json >> [ symphony_login >> symphony_add_record]
-
+        (
+            run_rdf2marc
+            >> download_marc
+            >> export_marc_json
+            >> convert_to_symphony_json
+            >> [symphony_login >> symphony_add_record]
+        )
 
     with TaskGroup(group_id="process_folio") as folio_task_group:
         download_folio_marc = DummyOperator(task_id="download_folio_marc", dag=dag)
@@ -110,7 +114,7 @@ with DAG(
 
     # Creates localAdminMetadata Record for Sinopia
     processed_sinopia = PythonOperator(
-        task_id="processed_sinopia", 
+        task_id="processed_sinopia",
         dag=dag,
         python_callable=create_admin_metadata,
         op_kwargs={
@@ -119,15 +123,12 @@ with DAG(
                 "{{ task_instance.xcom_pull(key='return_value', task_ids['post_new_symphony'])": "symphony"
             },
         },
-        trigger_rule="none_failed"
+        trigger_rule="none_failed",
     )
-
 
     # Logs into Sinopia to retrieve JWT
     login_sinopia = PythonOperator(
-        task_id='sinopia-login',
-        dag=dag,
-        python_callable=sinopia_login
+        task_id="sinopia-login", dag=dag, python_callable=sinopia_login
     )
 
     # Updates Sinopia URLS with HRID or CatID
@@ -137,8 +138,8 @@ with DAG(
         op_kwargs={
             "record": "{{ task_instance.xcom_pull(key='record', task_ids=['processed_sinopia'])[0]}}",
             "jwt": "{{ task_instance.xcom_pull(key='return_value', task_ids=['sinopia-login'])[0]}}",
-            "group": "stanford"
-        }
+            "group": "stanford",
+        },
     )
 
 listen_sns >> [symphony_task_group, folio_task_group] >> processed_sinopia

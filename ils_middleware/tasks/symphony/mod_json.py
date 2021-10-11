@@ -1,6 +1,7 @@
 """Converts PYMARC JSON to Symphony JSON"""
 import json
 
+
 def _get_subfields(subfields: dict) -> list:
     output = []
     for subfield, value in subfields.items():
@@ -36,4 +37,4 @@ def to_symphony_json(**kwargs):
     record["leader"] = pymarc_json.get("leader")
     for field in pymarc_json["fields"]:
         record["fields"].append(_get_fields(field))
-    return { "symphony_json": json.dumps(record) }
+    return {"symphony_json": json.dumps(record)}

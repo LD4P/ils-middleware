@@ -30,7 +30,7 @@ def send_to_s3(**kwargs) -> None:
         replace=True,
     )
     # Cheat to get the JSON into XCOM
-    return { "marc_json": json.dumps(marc_record.as_json()) }
+    return {"marc_json": json.dumps(marc_record.as_json())}
 
 
 def get_temp_instances(task_instance):
