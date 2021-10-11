@@ -2,7 +2,9 @@ from datetime import datetime, timedelta
 
 from ils_middleware.tasks.amazon.s3 import get_from_s3, send_to_s3
 from ils_middleware.tasks.amazon.sqs import SubscribeOperator
-from ils_middleware.tasks.sinopia.sinopia import UpdateIdentifier
+from ils_middleware.tasks.sinopia.local_metadata import create_admin_metadata
+from ils_middleware.tasks.sinopia.login import sinopia_login
+from ils_middleware.tasks.sinopia.new_metadata import AddLocalAdminMetadata
 from ils_middleware.tasks.sinopia.rdf2marc import Rdf2Marc
 from ils_middleware.tasks.symphony.login import SymphonyLogin
 from ils_middleware.tasks.symphony.new import NewMARCtoSymphony
@@ -91,7 +93,7 @@ with DAG(
             marc_json="{{ task_instance.xcom_pull(key='return_value', task_ids=['convert_to_symphony_json'])[0]}}",
             item_type=symphony_item_type,
             home_location=home_location,
-            token="{{ task_instance.xcom_pull(key='return_value', task_ids=['symphony_login'])[0]}}",
+            token="{{ task_instance.xcom_pull(key='message', task_ids=['listen'])[0]}}",
         )
 
         run_rdf2marc >> download_marc  >> export_marc_json >> convert_to_symphony_json >> [ symphony_login >> symphony_add_record]
@@ -106,16 +108,38 @@ with DAG(
 
         download_folio_marc >> export_folio_json >> send_to_folio
 
-    # Dummy Operator
-    processed_sinopia = DummyOperator(
-        task_id="processed_sinopia", dag=dag, trigger_rule="none_failed"
+    # Creates localAdminMetadata Record for Sinopia
+    processed_sinopia = PythonOperator(
+        task_id="processed_sinopia", 
+        dag=dag,
+        python_callable=create_admin_metadata,
+        op_kwargs={
+            "instance_url": "{{ task_instance.xcom_pull(key='resource-uri', task_ids=['aws_sqs_dev'])[0]}}",
+            "identifers_ils": {
+                "{{ task_instance.xcom_pull(key='return_value', task_ids['post_new_symphony'])": "symphony"
+            },
+        },
+        trigger_rule="none_failed"
     )
 
-    # Updates Sinopia URLS with HRID
+
+    # Logs into Sinopia to retrieve JWT
+    login_sinopia = PythonOperator(
+        task_id='sinopia-login',
+        dag=dag,
+        python_callable=sinopia_login
+    )
+
+    # Updates Sinopia URLS with HRID or CatID
     update_sinopia = PythonOperator(
         task_id="sinopia-id-update",
-        python_callable=UpdateIdentifier,
+        python_callable=AddLocalAdminMetadata,
+        op_kwargs={
+            "record": "{{ task_instance.xcom_pull(key='record', task_ids=['processed_sinopia'])[0]}}",
+            "jwt": "{{ task_instance.xcom_pull(key='return_value', task_ids=['sinopia-login'])[0]}}",
+            "group": "stanford"
+        }
     )
 
 listen_sns >> [symphony_task_group, folio_task_group] >> processed_sinopia
-processed_sinopia >> update_sinopia
+processed_sinopia >> login_sinopia >> update_sinopia
