@@ -2,7 +2,7 @@
 
 import rdflib
 
-from dags.tasks.sinopia.local_metadata import create_admin_metadata
+from ils_middleware.tasks.sinopia.local_metadata import create_admin_metadata
 
 
 def test_create_admin_metadata():
