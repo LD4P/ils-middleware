@@ -1,5 +1,5 @@
 """Retrieves related AdminMetadata resource info for downstream tasks."""
-import datetime
+from datetime import datetime
 import json
 import logging
 
@@ -9,6 +9,15 @@ import requests  # type: ignore
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_date(raw_date: str) -> datetime:
+    for pattern in ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%SZ", "%m/%d/%Y"]:
+        try:
+            return datetime.strptime(raw_date, pattern)
+        except ValueError:
+            pass
+    raise ValueError(f"no valid date format found for {raw_date}")
 
 
 def _query_for_ils_info(graph_jsonld: str, uri: str) -> dict:
@@ -31,7 +40,7 @@ def _query_for_ils_info(graph_jsonld: str, uri: str) -> dict:
     }}
     """
     for row in graph.query(ils_info_query):
-        output["export_date"] = datetime.datetime.fromisoformat(str(row[0]))
+        output["export_date"] = _parse_date(str(row[0]))
         output[str(row[2])] = str(row[1])  # type: ignore
     return output
 

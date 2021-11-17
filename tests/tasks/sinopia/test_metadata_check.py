@@ -13,7 +13,10 @@ from airflow import DAG
 from airflow.models.taskinstance import TaskInstance
 from airflow.operators.dummy import DummyOperator
 
-from ils_middleware.tasks.sinopia.metadata_check import existing_metadata_check
+from ils_middleware.tasks.sinopia.metadata_check import (
+    existing_metadata_check,
+    _parse_date,
+)
 
 
 def test_task():
@@ -145,3 +148,40 @@ def test_metadata_uri_not_found(mock_requests, mock_datetime, mock_task_instance
         existing_metadata_check(
             task_instance=task_instance, resource_uri="https://s.io/11ec"
         )
+
+
+def test_isoformat_export_date():
+    timestamp = _parse_date("2021-11-17T16:30:54.904032")
+
+    assert timestamp.year == 2021
+    assert timestamp.month == 11
+    assert timestamp.day == 17
+    assert timestamp.hour == 16
+    assert timestamp.minute == 30
+    assert timestamp.second == 54
+
+
+def test_isoformat_alt_export_date():
+    timestamp = _parse_date("2021-11-16T07:37:00Z")
+
+    assert timestamp.year == 2021
+    assert timestamp.month == 11
+    assert timestamp.day == 16
+    assert timestamp.hour == 7
+    assert timestamp.minute == 37
+    assert timestamp.second == 0
+
+
+def test_mmddyy_export_date():
+    timestamp = _parse_date("11/15/2021")
+
+    assert timestamp.year == 2021
+    assert timestamp.month == 11
+    assert timestamp.day == 15
+    assert timestamp.second == 0
+
+
+def test_failed_export_date_parse():
+    bad_date = "11-27-02021"
+    with pytest.raises(ValueError, match=f"no valid date format found for {bad_date}"):
+        _parse_date(bad_date)
