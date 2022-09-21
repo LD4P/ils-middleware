@@ -121,6 +121,9 @@ with DAG(
         new_or_overlay = PythonOperator(
             task_id="new-or-overlay",
             python_callable=existing_metadata_check,
+            op_kwargs={
+                "default_ils": "SIRSI"
+            }
         )
 
         symphony_add_record = PythonOperator(
