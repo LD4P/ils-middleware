@@ -66,7 +66,7 @@ def _retrieve_all_metadata(bf_admin_metadata_all: list) -> Optional[list]:
 def _retrieve_all_resource_refs(resources: list, task_instance, default_ils: str) -> dict:
     retrieved_resources = {}
     for resource_uri in resources:
-        # First check to see target_resource_id is present from SQS message
+        # Check to see target_resource_id is present from SQS message
         resource_info = task_instance.xcom_pull(key=resource_uri, task_ids="sqs-message-parse")
         target_resource_id = resource_info["target_resource_id"]
         if target_resource_id:
