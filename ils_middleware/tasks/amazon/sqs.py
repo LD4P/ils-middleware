@@ -38,7 +38,6 @@ def parse_messages(**kwargs) -> str:
     """Parses SQS Message Body into constituent part."""
     task_instance = kwargs["task_instance"]
     raw_sqs_messages = task_instance.xcom_pull(key="messages", task_ids="sqs-sensor")
-
     resources = []
     resources_with_errors = []
     for message in raw_sqs_messages:
@@ -54,6 +53,7 @@ def parse_messages(**kwargs) -> str:
                     "target": message_body["target"],
                     "resource_uri": resource_uri,
                     "resource": get_resource(resource_uri),
+                    "target_resource_id": message_body.get("targetResourceId"),                     
                 },
             )
         except KeyError:
