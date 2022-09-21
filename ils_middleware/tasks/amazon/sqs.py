@@ -53,7 +53,7 @@ def parse_messages(**kwargs) -> str:
                     "target": message_body["target"],
                     "resource_uri": resource_uri,
                     "resource": get_resource(resource_uri),
-                    "target_resource_id": message_body.get("targetResourceId"),                     
+                    "target_resource_id": message_body.get("targetResourceId"),
                 },
             )
         except KeyError:
