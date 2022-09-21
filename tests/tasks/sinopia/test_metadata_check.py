@@ -118,7 +118,9 @@ def mock_task_instance(monkeypatch):
                 "https://api.sinopia.io/resource/oprt5531",
             ]
         else:
-            return mock_push_store[key]
+            if key in mock_push_store:
+                return mock_push_store[key]
+            return {"target_resource_id": None}
 
     def mock_xcom_push(*args, **kwargs):
         key = kwargs.get("key")
