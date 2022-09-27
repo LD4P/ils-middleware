@@ -21,11 +21,6 @@ from ils_middleware.tasks.symphony.login import SymphonyLogin
 from ils_middleware.tasks.symphony.new import NewMARCtoSymphony
 from ils_middleware.tasks.symphony.mod_json import to_symphony_json
 from ils_middleware.tasks.symphony.overlay import overlay_marc_in_symphony
-from ils_middleware.tasks.folio.build import build_records
-from ils_middleware.tasks.folio.login import FolioLogin
-from ils_middleware.tasks.folio.graph import construct_graph
-from ils_middleware.tasks.folio.map import FOLIO_FIELDS, map_to_folio
-from ils_middleware.tasks.folio.new import post_folio_records
 
 
 def task_failure_callback(ctx_dict) -> None:
@@ -50,12 +45,12 @@ default_args = {
 }
 
 with DAG(
-    "stanford",
+    "stanford_sirsi",
     default_args=default_args,
-    description="Stanford Symphony and FOLIO DAG",
+    description="Stanford Symphony DAG",
     schedule_interval=timedelta(minutes=5),
     start_date=datetime(2021, 8, 24),
-    tags=["symphony", "folio"],
+    tags=["symphony", "stanford"],
     catchup=False,
     on_failure_callback=dag_failure_callback,
 ) as dag:
@@ -64,7 +59,7 @@ with DAG(
     # deletes the message from the SQS queue. If deletion of messages fails an AirflowException is thrown otherwise, the
     # message is pushed through XCom with the key 'messages'."
     # https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/_api/airflow/providers/amazon/aws/sensors/sqs/index.html
-    listen_sns = SubscribeOperator(queue="stanford-ils")
+    listen_sns = SubscribeOperator(queue="stanford-SIRSI")
 
     process_message = PythonOperator(
         task_id="sqs-message-parse",
@@ -161,60 +156,6 @@ with DAG(
             >> [symphony_add_record, symphony_overlay_record]
         )
 
-    with TaskGroup(group_id="process_folio") as folio_task_group:
-        folio_login = PythonOperator(
-            task_id="folio-login",
-            python_callable=FolioLogin,
-            op_kwargs={
-                "url": Variable.get("stanford_folio_auth_url"),
-                "username": Variable.get("stanford_folio_login"),
-                "password": Variable.get("stanford_folio_password"),
-                "tenant": "sul",
-            },
-        )
-
-        bf_graphs = PythonOperator(task_id="bf-graph", python_callable=construct_graph)
-
-        with TaskGroup(group_id="folio_mapping") as folio_map_task_group:
-            for folio_field in FOLIO_FIELDS:
-                bf_to_folio = PythonOperator(
-                    task_id=f"{folio_field}_task",
-                    python_callable=map_to_folio,
-                    op_kwargs={
-                        "folio_field": folio_field,
-                        "task_groups_ids": ["process_folio"],
-                    },
-                )
-
-        folio_records = PythonOperator(
-            task_id="build-folio",
-            python_callable=build_records,
-            op_kwargs={
-                "task_groups_ids": ["process_folio", "folio_mapping"],
-                "folio_url": Variable.get("stanford_folio_url"),
-                "username": Variable.get("stanford_folio_login"),
-                "password": Variable.get("stanford_folio_password"),
-                "tenant": "sul",
-            },
-        )
-
-        new_folio_records = PythonOperator(
-            task_id="new-or-upsert-folio-records",
-            python_callable=post_folio_records,
-            op_kwargs={
-                "folio_url": Variable.get("stanford_folio_url"),
-                "endpoint": "/instance-storage/batch/synchronous?upsert=true",
-                "tenant": "sul",
-                "task_groups_ids": [
-                    "process_folio",
-                ],
-                "token": "{{ task_instance.xcom_pull(key='return_value', task_ids='process_folio.folio-login')}}",
-            },
-        )
-
-        bf_graphs >> folio_map_task_group
-        folio_map_task_group >> [folio_records, folio_login] >> new_folio_records
-
     # Dummy Operator
     processed_sinopia = DummyOperator(
         task_id="processed_sinopia", dag=dag, trigger_rule="none_failed"
@@ -243,7 +184,6 @@ with DAG(
                         "process_symphony.post_new_symphony",
                         "process_symphony.post_overlay_symphony",
                     ],
-                    "FOLIO": ["process_folio.new-or-upsert-folio-records"],
                 },
             },
         )
@@ -268,7 +208,7 @@ with DAG(
 
 listen_sns >> [messages_received, messages_timeout]
 messages_received >> process_message
-process_message >> [symphony_task_group, folio_task_group] >> processed_sinopia
+process_message >> symphony_task_group >> processed_sinopia
 processed_sinopia >> sinopia_update_group >> notify_sinopia_updated
 notify_sinopia_updated >> processing_complete
 messages_timeout >> processing_complete
