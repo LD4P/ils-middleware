@@ -4,6 +4,8 @@ SPARQL queries run on BF Instance and Work RDF graphs from Sinopia."""
 import datetime
 import logging
 
+import requests
+
 from folio_uuid import FOLIONamespaces, FolioUUID
 from folioclient.FolioClient import FolioClient
 
@@ -116,6 +118,28 @@ def _instance_type_id(**kwargs) -> tuple:
     if ident is None:
         raise ValueError(f"instanceTypeId for {name} not found")
     return "instanceTypeId", ident
+
+def _folio_hrid(folio_client: FolioClient) -> str:
+    """Queries for instance hrid, increments, and saves back to folio"""
+    endpoint = "/hrid-settings-storage/hrid-settings"
+    hrid_settings = folio_client.folio_get_single_object(endpoint)
+    instance_count = hrid_settings['instances']['startNumber']
+    new_instance_count = instance_count + 1
+    if hrid_settings['commonRetainLeadingZeroes']:
+        number = str(new_instance_count).zfill(11)
+    else:
+        number = new_instance_count
+    instance_hrid = f"{hrid_settings['instances']['prefix']}{number}"
+    hrid_settings['instances']['startNumber'] = new_instance_count
+
+    # Puts new instance startNumber back into FOLIO
+    hrid_put_result = requests.put(f"{folio_client.okapi_url}{endpoint}",
+                                   headers=folio_client.okapi_headers)
+    hrid_put_result.raise_for_status()
+
+    return instance_hrid
+
+
 
 
 def _language(**kwargs) -> tuple:
@@ -266,7 +290,7 @@ def _inventory_record(**kwargs) -> dict:
 
     record = {
         "id": _folio_id(instance_uri, okapi_url),
-        "hrid": instance_uri,
+        "hrid": _folio_hrid(folio_client),
         "metadata": _create_update_metadata(**kwargs),
         "source": "SINOPIA",
     }
