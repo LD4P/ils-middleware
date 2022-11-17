@@ -20,6 +20,8 @@ def NewMARCtoAlma(**kwargs):
     s3_hook = S3Hook(aws_conn_id="aws_lambda_connection")
     task_instance = kwargs.get("task_instance")
     resources = task_instance.xcom_pull(key="resources", task_ids="sqs-message-parse")
+    alma_api_key = kwargs.get("alma_api_key")
+    alma_import_profile_id = kwargs.get("alma_import_profile_id")
 
     for instance_uri in resources:
         instance_path = urlparse(instance_uri).path
@@ -33,9 +35,6 @@ def NewMARCtoAlma(**kwargs):
     task_instance.xcom_pull(key=instance_uri, task_ids=temp_file)
     data = open(temp_file, "rb").read()
     logger.debug(f"file data: {data}")
-
-    alma_api_key = Variable.get("alma_sandbox_api_key")
-    alma_import_profile_id = Variable.get("import_profile_id")
 
     alma_uri = (
         "https://api-na.hosted.exlibrisgroup.com/almaws/v1/bibs?"
