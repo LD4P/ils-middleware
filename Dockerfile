@@ -1,4 +1,4 @@
-FROM apache/airflow:2.2.1-python3.9
+FROM apache/airflow:2.3.4-python3.10
 
 ENV POETRY_VERSION=1.1.8
 
