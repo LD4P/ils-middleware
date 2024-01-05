@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 def _default_transform(**kwargs) -> tuple:
     folio_field = kwargs["folio_field"]
     values = kwargs.get("values", [])
-    logger.debug(f"field: {folio_field} values: {values} type: {type(values)}")
     return folio_field, values
 
 
@@ -119,27 +118,27 @@ def _instance_type_id(**kwargs) -> tuple:
         raise ValueError(f"instanceTypeId for {name} not found")
     return "instanceTypeId", ident
 
+
 def _folio_hrid(folio_client: FolioClient) -> str:
     """Queries for instance hrid, increments, and saves back to folio"""
     endpoint = "/hrid-settings-storage/hrid-settings"
     hrid_settings = folio_client.folio_get_single_object(endpoint)
-    instance_count = hrid_settings['instances']['startNumber']
+    instance_count = hrid_settings["instances"]["startNumber"]
     new_instance_count = instance_count + 1
-    if hrid_settings['commonRetainLeadingZeroes']:
+    if hrid_settings["commonRetainLeadingZeroes"]:
         number = str(new_instance_count).zfill(11)
     else:
         number = new_instance_count
     instance_hrid = f"{hrid_settings['instances']['prefix']}{number}"
-    hrid_settings['instances']['startNumber'] = new_instance_count
+    hrid_settings["instances"]["startNumber"] = new_instance_count
 
     # Puts new instance startNumber back into FOLIO
-    hrid_put_result = requests.put(f"{folio_client.okapi_url}{endpoint}",
-                                   headers=folio_client.okapi_headers)
+    hrid_put_result = requests.put(
+        f"{folio_client.okapi_url}{endpoint}", headers=folio_client.okapi_headers
+    )
     hrid_put_result.raise_for_status()
 
     return instance_hrid
-
-
 
 
 def _language(**kwargs) -> tuple:
