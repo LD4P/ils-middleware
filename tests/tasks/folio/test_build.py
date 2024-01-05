@@ -72,6 +72,18 @@ class MockFolioClient(object):
             {"id": "6a2533a7-4de2-4e64-8466-074c2fa9308c", "name": "General note"},
         ]
 
+        self.okapi_headers = {"tenant": "sul"}
+        self.okapi_url = "https://okapi.edu"
+
+    def folio_get_single_object(self, endpoint):
+        match endpoint:
+
+            case "/hrid-settings-storage/hrid-settings":
+                return {
+                    "instances": {"startNumber": 1, "prefix": "i"},
+                    "commonRetainLeadingZeroes": True,
+                }
+
 
 @pytest.fixture
 def mock_folio_client(monkeypatch):
@@ -94,7 +106,7 @@ def test_happypath_build_records(
     )
     record = test_task_instance().xcom_pull(key=instance_uri)
 
-    assert record["hrid"].startswith(instance_uri)
+    assert record["hrid"] == "i00000000002"
     assert record["metadata"]["createdByUserId"].startswith(
         "21eaac74-1b29-5546-a13b-bc2e7e4717c6"
     )
@@ -164,7 +176,7 @@ def test_instance_format_ids(mock_task_instance):  # noqa: F811
     assert (format_ids[1][0]).startswith("8d511d33-5e85-4c5d-9bce-6e3c9cd0c324")
 
 
-def test_inventory_record(mock_task_instance):  # noqa: F811
+def test_inventory_record(mock_task_instance, mock_requests_okapi):  # noqa: F811
     record = _inventory_record(
         instance_uri=instance_uri,
         task_instance=test_task_instance(),
@@ -174,11 +186,12 @@ def test_inventory_record(mock_task_instance):  # noqa: F811
         username="test_user",
         tenant="sul",
     )
-    assert record["hrid"].startswith(instance_uri)
+    assert record["hrid"].startswith("i00000000002")
 
 
 def test_inventory_record_existing_metadata(
     mock_task_instance,  # noqa: F811
+    mock_requests_okapi,  # noqa
 ):  # noqa: F811
     metadata = {
         "createdDate": "2021-12-06T15:45:28.140795",
@@ -193,7 +206,7 @@ def test_inventory_record_existing_metadata(
         folio_client=MockFolioClient(),
         metadata=metadata,
     )
-    assert record["hrid"].startswith(instance_uri)
+    assert record["hrid"].startswith("i00000000002")
     assert record["metadata"]["createdDate"].startswith("2021-12-06T15:45:28.140795")
 
 

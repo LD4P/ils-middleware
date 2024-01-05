@@ -6,7 +6,6 @@ from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 
-from ils_middleware.tasks.amazon.s3 import get_from_s3, send_to_s3
 from ils_middleware.tasks.amazon.sqs import SubscribeOperator, parse_messages
 
 from ils_middleware.tasks.sinopia.local_metadata import new_local_admin_metadata
@@ -16,7 +15,8 @@ from ils_middleware.tasks.sinopia.email import (
 )
 
 from ils_middleware.tasks.sinopia.login import sinopia_login
-from ils_middleware.tasks.sinopia.metadata_check import existing_metadata_check
+
+# from ils_middleware.tasks.sinopia.metadata_check import existing_metadata_check
 from ils_middleware.tasks.folio.build import build_records
 from ils_middleware.tasks.folio.login import FolioLogin
 from ils_middleware.tasks.folio.graph import construct_graph
