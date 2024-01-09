@@ -15,7 +15,9 @@ from airflow.operators.dummy import DummyOperator
 
 from ils_middleware.tasks.sinopia.metadata_check import (
     existing_metadata_check,
+    _retrieve_all_resource_refs,
     _get_retrieve_metadata_resource,
+    _get_relationships,
     _retrieve_all_metadata,
 )
 
@@ -184,3 +186,26 @@ def test_dups_in_retrieve_all_metadata(mock_requests):
     )
 
     assert result == [{"SIRSI": "13704749"}]
+
+
+def test_get_relationships_no_resource(mock_requests, caplog):
+    missing_result = _get_relationships("https://sinopia.io/resource/no-resource")
+    assert missing_result is None
+    assert (
+        "Failed to retrieve https://sinopia.io/resource/no-resource: 401" in caplog.text
+    )
+
+
+def test_retrieve_all_resource_refs_target_resource():
+    mock_task_instance = MagicMock()
+    mock_task_instance.xcom_pull = lambda **kwargs: {
+        "target_resource_id": "https://sinopia.io/resource/34556-abcde"
+    }
+    retrieved_resources = _retrieve_all_resource_refs(
+        ["https://sinopia.io/resource/abcdefa-12345"], mock_task_instance, "folio"
+    )
+    assert retrieved_resources == {
+        "https://sinopia.io/resource/abcdefa-12345": [
+            {"folio": "https://sinopia.io/resource/34556-abcde"}
+        ]
+    }
