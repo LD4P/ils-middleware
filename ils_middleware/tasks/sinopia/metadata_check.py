@@ -5,7 +5,7 @@ import logging
 import rdflib
 import requests  # type: ignore
 
-from typing import Optional
+from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,16 @@ def _query_for_ils_info(graph_jsonld: str, uri: str) -> dict:
     for row in graph.query(ils_info_query):
         output[str(row[0])] = str(row[1])  # type: ignore
     return output
+
+
+def _get_relationships(resource_uri: str) -> Union[list, None]:
+    result = requests.get(f"{resource_uri}/relationships")
+    if result.status_code > 399:
+        msg = f"Failed to retrieve {resource_uri}: {result.status_code}\n{result.text}"
+        logging.error(msg)
+        return None
+
+    return result.json().get("sinopiaHasLocalAdminMetadataInferredRefs")
 
 
 def _get_retrieve_metadata_resource(uri: str) -> Optional[dict]:
@@ -76,13 +86,10 @@ def _retrieve_all_resource_refs(
         if target_resource_id:
             retrieved_resources[resource_uri] = [{default_ils: target_resource_id}]
             continue
-        result = requests.get(f"{resource_uri}/relationships")
-        if result.status_code > 399:
-            msg = f"Failed to retrieve {resource_uri}: {result.status_code}\n{result.text}"
-            logging.error(msg)
-            continue
 
-        metadata_uris = result.json().get("sinopiaHasLocalAdminMetadataInferredRefs")
+        metadata_uris = _get_relationships(resource_uri)
+        if metadata_uris is None:
+            continue
 
         ils_info = _retrieve_all_metadata(metadata_uris)
         if ils_info:
