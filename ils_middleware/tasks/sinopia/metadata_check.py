@@ -5,7 +5,7 @@ import logging
 import rdflib
 import requests  # type: ignore
 
-from typing import Optional
+from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,16 @@ def _query_for_ils_info(graph_jsonld: str, uri: str) -> dict:
     for row in graph.query(ils_info_query):
         output[str(row[0])] = str(row[1])  # type: ignore
     return output
+
+
+def _get_relationships(resource_uri: str) -> Union[list, None]:
+    result = requests.get(f"{resource_uri}/relationships")
+    if result.status_code > 399:
+        msg = f"Failed to retrieve {resource_uri}: {result.status_code}\n{result.text}"
+        logging.error(msg)
+        return None
+
+    return result.json().get("sinopiaHasLocalAdminMetadataInferredRefs")
 
 
 def _get_retrieve_metadata_resource(uri: str) -> Optional[dict]:
@@ -63,16 +73,24 @@ def _retrieve_all_metadata(bf_admin_metadata_all: list) -> Optional[list]:
     return None
 
 
-def _retrieve_all_resource_refs(resources: list) -> dict:
+def _retrieve_all_resource_refs(
+    resources: list, task_instance, default_ils: str
+) -> dict:
     retrieved_resources = {}
     for resource_uri in resources:
-        result = requests.get(f"{resource_uri}/relationships")
-        if result.status_code > 399:
-            msg = f"Failed to retrieve {resource_uri}: {result.status_code}\n{result.text}"
-            logging.error(msg)
+        # Check to see target_resource_id is present from SQS message
+        resource_info = task_instance.xcom_pull(
+            key=resource_uri, task_ids="sqs-message-parse"
+        )
+        target_resource_id = resource_info["target_resource_id"]
+        if target_resource_id:
+            retrieved_resources[resource_uri] = [{default_ils: target_resource_id}]
             continue
 
-        metadata_uris = result.json().get("sinopiaHasLocalAdminMetadataInferredRefs")
+        metadata_uris = _get_relationships(resource_uri)
+        if metadata_uris is None:
+            continue
+
         ils_info = _retrieve_all_metadata(metadata_uris)
         if ils_info:
             retrieved_resources[resource_uri] = ils_info
@@ -83,11 +101,13 @@ def _retrieve_all_resource_refs(resources: list) -> dict:
 def existing_metadata_check(*args, **kwargs):
     """Queries Sinopia API for related resources of an instance."""
     task_instance = kwargs["task_instance"]
+    default_ils = kwargs.get("default_ils")
     resource_uris = task_instance.xcom_pull(
         key="resources", task_ids="sqs-message-parse"
     )
-
-    resource_refs = _retrieve_all_resource_refs(resource_uris)
+    resource_refs = _retrieve_all_resource_refs(
+        resource_uris, task_instance, default_ils
+    )
     new_resources = []
     overlay_resources = []
     for resource_uri in resource_uris:
