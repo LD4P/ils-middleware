@@ -20,9 +20,16 @@ BF_TO_FOLIO_MAP = {
         "uri": "instance",
     },
     "identifiers.isbn": {
-        "template": bf_instance_map.identifier,
-        "uri": "instance",
-        "class": "bf:Isbn",
+        "template": bf_instance_map.isbn_identifier,
+        "uri": "instance"
+    },
+    "identifiers.issn": {
+        "template": bf_work_map.issn_identifier,
+        "uri": "work"
+    },
+    "identifies.lccn": {
+        "template": bf_instance_map.lccn_identifier,
+        "uri": "instance"
     },
     "identifiers.oclc": {
         "template": bf_instance_map.local_identifier,

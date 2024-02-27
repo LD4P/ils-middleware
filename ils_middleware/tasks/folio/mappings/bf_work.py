@@ -41,6 +41,20 @@ WHERE {{
 }}
 """
 
+issn_identifier = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
+PREFIX sinopia: <http://sinopia.io/vocabulary/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?issn
+WHERE {{
+   <{bf_work}> a bf:Work ;
+		bf:identifiedBy ?id .
+   ?id a bf:Issn ;
+		rdf:value ?issn .
+ }}
+ """
+
 language = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
 
 SELECT ?language_uri ?language
