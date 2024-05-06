@@ -25,7 +25,7 @@ Based on the documentation, [Running Airflow in Docker](https://airflow.apache.o
 AWS_ACCESS_KEY_ID=999999 AWS_SECRET_ACCESS_KEY=1231 aws sqs \
     --endpoint-url=http://localhost:4566 create-queue \
     --region us-west-2 \
-    --queue-name all-instituions
+    --queue-name all-institutions
 ```
 
 ### Setup the local AWS connection for SQS

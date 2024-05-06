@@ -2,7 +2,8 @@ import logging
 from airflow.models import Variable
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from rdflib import Graph, URIRef, Namespace
-from rdflib.namespace import RDF, RDFS
+from rdflib.namespace import RDF
+from copy import deepcopy
 from lxml import etree as ET
 from ils_middleware.tasks.amazon.alma_ns import alma_namespaces
 
@@ -20,16 +21,13 @@ def send_work_to_alma_s3(**kwargs):
         instance_graph = Graph()
         work_graph = Graph()
         instance_graph.parse(instance_uri)
-        # Define the bf and bflc namespaces
+        # Define the bf namespace
         bf = Namespace("http://id.loc.gov/ontologies/bibframe/")
         for prefix, url in alma_namespaces:
             work_graph.bind(prefix, url)
         work_uri = instance_graph.value(
             subject=URIRef(instance_uri), predicate=bf.instanceOf
         )
-        if work_uri is None:
-            logger.info(f"Instance {instance_uri} has no work.")
-            continue
         work_uri = URIRef(work_uri)
         # Explicitly state that work_uri is of type bf:Work
         work_graph.add((work_uri, RDF.type, bf.Work))
@@ -37,20 +35,43 @@ def send_work_to_alma_s3(**kwargs):
         work_graph.parse(work_uri)
         # add the instance to the work graph
         work_graph.add((work_uri, bf.hasInstance, URIRef(instance_uri)))
-        # Find all bflc:PrimaryContribution instances and their associated bf:agent URIs
-        for s, p, o in work_graph.triples((None, bf.agent, None)):
-            # s is the subject of the triple, which should be a bflc:PrimaryContribution
-            primary_contribution = s
-            # o is the object of the triple, which should be the bf:agent URI
-            agent_uri = o
-            # get the label of the agent
-            agent_label = work_graph.value(subject=agent_uri, predicate=RDFS.label)
-            # add it to the primary contribution
-            work_graph.add((primary_contribution, RDFS.label, agent_label))
 
         # serialize the work graph
         bfwork_alma_xml = work_graph.serialize(format="pretty-xml", encoding="utf-8")
         tree = ET.fromstring(bfwork_alma_xml)
+
+        # Define namespaces
+        namespaces = {
+            "bf": "http://id.loc.gov/ontologies/bibframe/",
+            "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        }
+
+        # Find all bf:Work elements
+        works = tree.xpath("//bf:Work", namespaces=namespaces)
+
+        for work in works:
+            work_about = work.attrib[
+                "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"
+            ]
+
+            # Find the bf:relatedTo element with the same rdf:resource attribute value
+            related_to = tree.xpath(
+                f'//bf:relatedTo[@rdf:resource="{work_about}"]', namespaces=namespaces
+            )
+
+            if related_to:
+                # Remove the rdf:resource attribute from the bf:relatedTo element
+                related_to[0].attrib.pop(
+                    "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource", None
+                )
+
+                # Clone the bf:Work element and append it under the bf:relatedTo element
+                cloned_work = deepcopy(work)
+                related_to[0].append(cloned_work)
+
+                # Remove the original bf:Work element that was cloned
+                work.getparent().remove(work)
 
         # apply xslt to normalize work
         xslt = ET.parse("ils_middleware/tasks/amazon/xslt/normalize-work.xsl")

@@ -6,7 +6,7 @@ exclude-result-prefixes="sinopiabf" >
   <xsl:template match="*[local-name()='instanceOf']">
     <xsl:copy>
       <xsl:attribute name="rdf:resource" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <xsl:value-of select="//rdf:Description/@rdf:about" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+        <xsl:value-of select=".//rdf:Description/@rdf:about" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
       </xsl:attribute>
     </xsl:copy>
   </xsl:template>
