@@ -7,16 +7,15 @@ PREFIX bflc: <http://id.loc.gov/ontologies/bflc/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?agent ?role
+SELECT ?primary_contribution ?role
 WHERE {{
-    <{bf_work}> a bf:Work .
-    <{bf_work}> bf:contribution ?contrib_bnode .
-    ?contrib_bnode a bf:Contribution .
-    ?contrib_bnode bf:role ?role_uri .
-    ?role_uri rdfs:label ?role .
-    ?contrib_bnode bf:agent ?agent_uri .
-    ?agent_uri a {bf_class} .
-    ?agent_uri rdfs:label ?agent .
+    <{bf_work}> a bf:Work ;
+        bf:contribution ?contribution . 
+    ?contribution bf:agent ?primarycontribution .
+    ?primarycontribution a bf:Person .
+    ?primarycontribution rdfs:label ?primary_contribution .
+    ?contribution bf:role ?type .
+    ?type rdfs:label ?role
 }}
 """
 
