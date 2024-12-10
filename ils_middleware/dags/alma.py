@@ -60,6 +60,7 @@ institutions = [
     "jmu",
     "brandeis",
     "PUC",
+    "utoronto",
 ]
 
 
