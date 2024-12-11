@@ -37,6 +37,15 @@ def test_instance_type_id(test_graph: rdflib.Graph):
 
 
 @typing.no_type_check
+def test_issn(test_graph: rdflib.Graph):
+    sparql = bf_work_map.issn_identifier.format(bf_work=work_uri)
+
+    issn = [row[0] for row in test_graph.query(sparql)]
+
+    assert str(issn[0]).startswith("1940-5758")
+
+
+@typing.no_type_check
 def test_language(test_graph: rdflib.Graph):
     sparql = bf_work_map.language.format(bf_work=work_uri)
 
