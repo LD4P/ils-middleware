@@ -79,6 +79,14 @@ WHERE {{
     <{bf_work}> bf:subject ?subject_node .
     OPTIONAL {{
         ?subject_node rdfs:label ?subject .
+
+SELECT ?genre
+WHERE {{
+    <{bf_work}> a bf:Work .
+    <{bf_work}> bf:genreForm ?genre_node .
+    OPTIONAL {{
+        ?genre_node rdfs:label ?genre .
     }}
+    
 }}
 """
