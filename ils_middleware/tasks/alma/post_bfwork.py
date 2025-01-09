@@ -90,7 +90,9 @@ def NewWorktoAlma(**kwargs):
             put_mms_id_str,
         )
     else:
-        raise Exception(f"Unexpected status code from Alma API: {status}")
+        raise Exception(
+            f"Unexpected status code from Alma API: {status} Error detail: {result}"
+        )
 
 
 def putWorkToAlma(
@@ -118,5 +120,5 @@ def putWorkToAlma(
             raise Exception(f"Internal server error from Alma API: {put_update_status}")
         case _:
             raise Exception(
-                f"Unexpected status code from Alma API: {put_update_status}"
+                f"Unexpected status code from Alma API: {put_update_status}. Error detail: {put_update.text}"
             )
