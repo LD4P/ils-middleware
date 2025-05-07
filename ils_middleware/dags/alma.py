@@ -62,6 +62,7 @@ institutions = [
     "PUC",
     "utoronto",
     "ucf",
+    "usf",
 ]
 
 
