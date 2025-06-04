@@ -10,7 +10,7 @@ uri = "https://api.stage.sinopia.io/resource/b0319047-acd0-4f30-bd8b-98e6c1bac6b
 
 @typing.no_type_check
 def test_isbn(test_graph: rdflib.Graph):
-    sparql = bf_instance_map.identifier.format(bf_instance=uri, bf_class="bf:Isbn")
+    sparql = bf_instance_map.isbn_identifier.format(bf_instance=uri)
 
     isbns = [row[0] for row in test_graph.query(sparql)]
 
@@ -25,6 +25,15 @@ def test_instance_format_id(test_graph: rdflib.Graph):
 
     assert str(instance_formats[0][0]).startswith("computer")
     assert str(instance_formats[0][1]).startswith("online resource")
+
+
+@typing.no_type_check
+def test_lccn(test_graph: rdflib.Graph):
+    sparql = bf_instance_map.lccn_identifier.format(bf_instance=uri)
+
+    lccn = [row[0] for row in test_graph.query(sparql)]
+
+    assert str(lccn[0]).startswith("2022036707")
 
 
 @typing.no_type_check
