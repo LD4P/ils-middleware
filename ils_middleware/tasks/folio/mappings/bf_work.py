@@ -81,6 +81,7 @@ WHERE {{
         ?subject_node rdfs:label ?subject .
 
     }}
+}}
 """
 
 genre = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
