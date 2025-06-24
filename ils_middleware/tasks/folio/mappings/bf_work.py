@@ -79,6 +79,21 @@ WHERE {{
     <{bf_work}> bf:subject ?subject_node .
     OPTIONAL {{
         ?subject_node rdfs:label ?subject .
+
+    }}
+}}
+"""
+
+genre = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?genre
+WHERE {{
+    <{bf_work}> a bf:Work .
+    <{bf_work}> bf:genreForm ?genre_node .
+    OPTIONAL {{
+        ?genre_node rdfs:label ?genre .
     }}
 }}
 """
