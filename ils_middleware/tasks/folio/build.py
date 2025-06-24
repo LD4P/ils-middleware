@@ -229,6 +229,8 @@ def genre(**kwargs) -> tuple:
     for row in values:
         genre.append(row[0])
 
+    return "genre", genre
+
 
 def _title(**kwargs) -> tuple:
     values = kwargs["values"]
