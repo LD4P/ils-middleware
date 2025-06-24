@@ -225,6 +225,15 @@ def _subjects(**kwargs) -> tuple:
     return "subjects", subjects
 
 
+def genre(**kwargs) -> tuple:
+    values = kwargs["values"]
+    genre = []
+    for row in values:
+        genre.append(row[0])
+
+    return "genre", genre
+
+
 def _title(**kwargs) -> tuple:
     values = kwargs["values"]
 
@@ -258,6 +267,7 @@ transforms = {
     "contributor.primary.Person": _primary_contributor,
     "publication": _publication,
     "subjects": _subjects,
+    "genre": _subjects,
     "title": _title,
 }
 
