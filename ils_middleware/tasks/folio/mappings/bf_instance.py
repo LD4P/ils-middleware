@@ -95,8 +95,8 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?edition
 WHERE {{
-    <{bf_work}> a bf:Work .
-    <{bf_work}> bf:editionStatement ?edition .
+    <{bf_instance}> a bf:Instance .
+    <{bf_instance}> bf:editionStatement ?edition .
 }}
 """
 
