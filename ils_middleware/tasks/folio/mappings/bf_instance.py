@@ -2,19 +2,6 @@
 BF Instance with its associated BF Work.
 """
 
-identifier = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-SELECT ?identifier
-WHERE {{
-    <{bf_instance}> a bf:Instance .
-    <{bf_instance}> bf:identifiedBy ?ident_bnode .
-    ?ident_bnode a {bf_class} .
-    ?ident_bnode rdf:value ?identifier .
-}}
-"""
-
 instance_format_id = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -26,6 +13,35 @@ WHERE {{
     <{bf_instance}> bf:carrier ?format_term_uri .
     ?format_category_uri rdfs:label ?format_category .
     ?format_term_uri rdfs:label ?format_term .
+}}
+"""
+
+isbn_identifier = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
+PREFIX sinopia: <http://sinopia.io/vocabulary/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+
+SELECT ?isbn
+WHERE {{
+   <{bf_instance}> a bf:Instance ;
+        bf:identifiedBy ?id .
+   ?id a bf:Isbn ;
+        rdf:value ?isbn .
+}}
+"""
+
+lccn_identifier = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
+PREFIX sinopia: <http://sinopia.io/vocabulary/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?lccn
+WHERE {{
+   <{bf_instance}> a bf:Instance ;
+        bf:identifiedBy ?id .
+   ?id a bf:Lccn ;
+        rdf:value ?lccn .
 }}
 """
 
@@ -126,7 +142,7 @@ title = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?main_title ?subtitle ?part_number ?part_name
+SELECT ?main_title ?subtitle ?part_number ?part_name ?responsibility
 WHERE {{
   <{bf_instance}> a bf:Instance .
   <{bf_instance}> bf:title ?title .
@@ -139,7 +155,10 @@ WHERE {{
      ?title bf:partNumber ?part_number .
   }}
   OPTIONAL {{
-     ?title bf:partName ?part_name
+     ?title bf:partName ?part_name .
+  }}
+  OPTIONAL {{
+     ?title  bf:responsibilityStatement ?responsibility .
   }}
 }}
 """
