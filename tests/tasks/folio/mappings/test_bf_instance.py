@@ -9,6 +9,15 @@ uri = "https://api.stage.sinopia.io/resource/b0319047-acd0-4f30-bd8b-98e6c1bac6b
 
 
 @typing.no_type_check
+def test_edition(test_graph: rdflib.Graph):
+    sparql = bf_instance_map.editions.format(bf_instance=uri)
+
+    editions = [row[0] for row in test_graph.query(sparql)]
+    sorted_editions = sorted(editions, key=lambda x: x.value)
+    assert str(sorted_editions[1]).startswith("1st edition")
+
+
+@typing.no_type_check
 def test_isbn(test_graph: rdflib.Graph):
     sparql = bf_instance_map.identifier.format(bf_instance=uri, bf_class="bf:Isbn")
 
