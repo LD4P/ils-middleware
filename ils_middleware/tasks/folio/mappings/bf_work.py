@@ -90,7 +90,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT ?subject ?person_contribution ?role
 WHERE {
 	<{bf_work}> a bf:Work .
-	<{bf_work}> bf:contribution ?contribution . 
+	<{bf_work}> bf:contribution ?contribution .
 	?contribution bf:agent ?pcontribution .
 	?pcontribution a bf:Person .
 	?pcontribution rdfs:label ?person_contribution .
@@ -107,7 +107,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT ?subject ?corporate_contribution ?role
 WHERE {
 	<{bf_work}> a bf:Work .
-	<{bf_work}> bf:contribution ?contribution . 
+	<{bf_work}> bf:contribution ?contribution .
 	?contribution bf:agent ?ccontribution .
 	?ccontribution a bf:Organization .
 	?ccontribution rdfs:label ?corporate_contribution .
