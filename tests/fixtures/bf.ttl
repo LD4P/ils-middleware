@@ -58,6 +58,7 @@ bf:Work rdfs:label "http://id.loc.gov/ontologies/bibframe/Work" .
     bf:copyrightDate "©2020" ;
     bf:dimensions "30 cm by 15 cm"@eng ;
     bf:editionStatement "1a edizione"@ita ;
+    bf:editionStatement "1st edition"@eng ;
     bf:electronicLocator <https://phaidra.cab.unipd.it/detail/o:445140?mycoll=o:432583>,
         <https://purl.stanford.edu/mf283yt5578> ;
     bf:extent [ a bf:Extent ;
@@ -115,7 +116,6 @@ bf:Work rdfs:label "http://id.loc.gov/ontologies/bibframe/Work" .
         [ a bf:Contribution ;
             bf:agent <http://id.loc.gov/authorities/names/n97060063> ;
             bf:role <http://id.loc.gov/vocabulary/relators/aut> ] ;
-    bf:editionStatement "1st edition"@eng ;
     bf:genreForm <http://id.loc.gov/authorities/genreForms/gf2014026113> ;
     bf:hasInstance <https://api.stage.sinopia.io/resource/b0319047-acd0-4f30-bd8b-98e6c1bac6b0> ;
     bf:language <http://id.loc.gov/vocabulary/languages/ita> ;

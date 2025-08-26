@@ -19,15 +19,6 @@ def test_contributor_author_person(test_graph: rdflib.Graph):
 
 
 @typing.no_type_check
-def test_edition(test_graph: rdflib.Graph):
-    sparql = bf_work_map.editions.format(bf_work=work_uri)
-
-    editions = [row[0] for row in test_graph.query(sparql)]
-
-    assert str(editions[0]).startswith("1st edition")
-
-
-@typing.no_type_check
 def test_instance_type_id(test_graph: rdflib.Graph):
     sparql = bf_work_map.instance_type_id.format(bf_work=work_uri)
 
