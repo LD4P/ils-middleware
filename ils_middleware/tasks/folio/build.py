@@ -56,6 +56,10 @@ def _primary_contributor(**kwargs) -> tuple:
     return _contributors(primary=True, contrib_name="Personal name", **kwargs)
 
 
+def _primary_corporate_contributor(**kwargs):
+    return _contributors(primary=True, contrib_name="Corporate name", **kwargs)
+
+
 def _folio_id(resource_uri: str, okapi_url: str) -> str:
     folio_id = FolioUUID(okapi_url, FOLIONamespaces.instances, resource_uri)
     return str(folio_id)
@@ -265,6 +269,7 @@ transforms = {
     "notes": _notes,
     "physical_description": _physical_descriptions,
     "contributor.primary.Person": _primary_contributor,
+    "contributor.primary.Corporation": _primary_corporate_contributor,
     "publication": _publication,
     "subjects": _subjects,
     "genre": _subjects,
