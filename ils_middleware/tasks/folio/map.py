@@ -25,7 +25,7 @@ BF_TO_FOLIO_MAP = {
         "uri": "instance",
     },
     "identifiers.issn": {"template": bf_work_map.issn_identifier, "uri": "work"},
-    "identifies.lccn": {"template": bf_instance_map.lccn_identifier, "uri": "instance"},
+    "identifiers.lccn": {"template": bf_instance_map.lccn_identifier, "uri": "instance"},
     "identifiers.oclc": {
         "template": bf_instance_map.local_identifier,
         "uri": "instance",
@@ -49,12 +49,12 @@ BF_TO_FOLIO_MAP = {
         "class": "bf:Title",
     },
     "person_contributor": {
-       "template": bf_work_map.person_contributor, "uri"; "work"},
-       "uri": "work",
+        "template": bf_work_map.person_contributor, "uri"; "work"},
+        "uri": "work",
     },
     "corporate_contributor": {
-       "template": bf_work_map.corporate_contribtuor,
-       "uri"; "work"},
+        "template": bf_work_map.corporate_contributor,
+        "uri": "work",
     },
 }
 
