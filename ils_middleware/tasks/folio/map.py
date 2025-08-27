@@ -49,8 +49,7 @@ BF_TO_FOLIO_MAP = {
         "class": "bf:Title",
     },
     "person_contributor": {"template": bf_work_map.person_contributor, "uri": "work"},
-    "corporate_contributor": {"template": bf_work_map.corporate_contributor, "uri": "work",
-    },
+    "corporate_contributor": {"template": bf_work_map.corporate_contributor, "uri": "work"},
 }
 
 FOLIO_FIELDS = BF_TO_FOLIO_MAP.keys()
