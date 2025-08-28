@@ -270,6 +270,7 @@ transforms = {
     "physical_description": _physical_descriptions,
     "contributor.primary.Person": _primary_contributor,
     "contributor.primary.Corporation": _primary_corporate_contributor,
+    "contributor": _contributors,
     "publication": _publication,
     "subjects": _subjects,
     "genre": _subjects,
