@@ -18,6 +18,7 @@ import ils_middleware.tasks.folio.build as folio_build
 from ils_middleware.tasks.folio.build import (
     build_records,
     _default_transform,
+    _contributors,
     _identifiers,
     _instance_format_ids,
     _instance_type_id,
@@ -25,6 +26,7 @@ from ils_middleware.tasks.folio.build import (
     _language,
     _mode_of_issuance_id,
     _notes,
+    _primary_corporate_contributor,
     _physical_descriptions,
     _publication,
     _subjects,
@@ -49,11 +51,13 @@ class MockFolioClient(object):
         self.okapi_url = okapi_uri
         self.username = "folio_user"
         self.contributor_types = [
-            {"id": "6e09d47d-95e2-4d8a-831b-f777b8ef6d81", "name": "Author"}
+            {"id": "6e09d47d-95e2-4d8a-831b-f777b8ef6d81", "name": "Author"},
+            {"id": "9deb29d1-3e71-4951-9413-a80adac703d0", "name": "Editor"},
         ]
         self.contrib_name_types = [
             {"id": "2b94c631-fca9-4892-a730-03ee529ffe2a", "name": "Personal name"},
             {"id": "e8b311a6-3b21-43f2-a269-dd9310cb2d0a", "name": "Meeting name"},
+            {'id': '2e48e713-17f3-4c13-a9f8-23845bb210aa', 'name': 'Corporate name'},
         ]
 
         self.identifier_types = [
@@ -167,6 +171,19 @@ def test_default_transform_value_listing():
     assert default_tuple[0].startswith(folio_field)
     assert name in default_tuple[1][0]
 
+
+def test_contributors():
+    contributor = _contributors(
+        folio_client=MockFolioClient(),
+        values=[["Library of Congress", "editor"]],
+        record={},
+        contrib_name_type="Corporate name"
+    )
+
+    assert contributor[0].startswith("contributors")
+    assert contributor[1][0]['name'].startswith("Library of Congress")
+    assert contributor[1][0]['contributorTypeId'].startswith("9deb29d1-3e71-4951")
+    
 
 def test_identifiers_doi(mock_folio_client, mock_task_instance):  # noqa: F811
     identifiers = _identifiers(

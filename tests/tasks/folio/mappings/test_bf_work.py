@@ -7,8 +7,6 @@ import ils_middleware.tasks.folio.mappings.bf_work as bf_work_map
 
 work_uri = "https://api.stage.sinopia.io/resource/c96d8b55-e0ac-48a5-9a9b-b0684758c99e"
 
-BF = rdflib.Namespace("http://id.loc.gov/ontologies/bibframe/")
-
 
 @typing.no_type_check
 def test_contributor_author_person(test_graph: rdflib.Graph):
@@ -21,27 +19,15 @@ def test_contributor_author_person(test_graph: rdflib.Graph):
 
 
 @typing.no_type_check
-def test_contributor_corporation():
-    work_uri_ref = rdflib.URIRef(work_uri)
-    stanford = rdflib.URIRef("https://stanford.edu/")
-    aut = rdflib.URIRef("http://id.loc.gov/vocabulary/relators/aut")
-    test_graph = rdflib.Graph()
-    test_graph.add((work_uri_ref, rdflib.RDF.type, BF.Work))
-    contrib_bnode = rdflib.BNode()
-    test_graph.add((work_uri_ref, BF.contribution, contrib_bnode))
-    test_graph.add((contrib_bnode, rdflib.RDF.type, BF.Contribution))
-    test_graph.add((contrib_bnode, BF.role, aut))
-    test_graph.add((contrib_bnode, BF.agent, stanford))
-    test_graph.add((stanford, rdflib.RDF.type, BF.Organization))
-    test_graph.add((stanford, rdflib.RDFS.label, rdflib.Literal("Stanford University")))
-    test_graph.add((aut, rdflib.RDFS.label, rdflib.Literal("Author")))
-
+def test_contributor_corporation(test_graph: rdflib.Graph):
     sparql = bf_work_map.contributor.format(
         bf_work=work_uri, bf_class="bf:Organization"
     )
     corporate_contributors = [row for row in test_graph.query(sparql)]
 
-    assert len(corporate_contributors) == 1
+    assert str(corporate_contributors[0][0]).startswith("British National Library")
+    assert str(corporate_contributors[0][1]).startswith("editor")
+    
 
 
 @typing.no_type_check
