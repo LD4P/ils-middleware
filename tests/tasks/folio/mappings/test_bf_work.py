@@ -27,7 +27,6 @@ def test_contributor_corporation(test_graph: rdflib.Graph):
 
     assert str(corporate_contributors[0][0]).startswith("British National Library")
     assert str(corporate_contributors[0][1]).startswith("editor")
-    
 
 
 @typing.no_type_check
