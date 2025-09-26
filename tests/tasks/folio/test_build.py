@@ -26,7 +26,6 @@ from ils_middleware.tasks.folio.build import (
     _language,
     _mode_of_issuance_id,
     _notes,
-    _primary_corporate_contributor,
     _physical_descriptions,
     _publication,
     _subjects,
