@@ -20,6 +20,7 @@ WHERE {{
 }}
 """
 
+
 instance_type_id = """PREFIX bf: <http://id.loc.gov/ontologies/bibframe/>
 
 SELECT ?instance_type_id

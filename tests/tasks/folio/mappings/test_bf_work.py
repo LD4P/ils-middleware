@@ -19,6 +19,17 @@ def test_contributor_author_person(test_graph: rdflib.Graph):
 
 
 @typing.no_type_check
+def test_contributor_corporation(test_graph: rdflib.Graph):
+    sparql = bf_work_map.contributor.format(
+        bf_work=work_uri, bf_class="bf:Organization"
+    )
+    corporate_contributors = [row for row in test_graph.query(sparql)]
+
+    assert str(corporate_contributors[0][0]).startswith("British National Library")
+    assert str(corporate_contributors[0][1]).startswith("editor")
+
+
+@typing.no_type_check
 def test_instance_type_id(test_graph: rdflib.Graph):
     sparql = bf_work_map.instance_type_id.format(bf_work=work_uri)
 
