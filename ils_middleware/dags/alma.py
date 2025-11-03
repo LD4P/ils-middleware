@@ -64,6 +64,7 @@ institutions = [
     "ucf",
     "usf",
     "iowa_state",
+    "beit_ariela",
 ]
 
 
