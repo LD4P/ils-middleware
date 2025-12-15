@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ils-middleware"
-version = "1.4.4"
+version = "1.4.5"
 description = "Sinopia ILS Middleware using Apache Airflow"
 authors = ["Jeremy Nelson <jpnelson@stanford.edu>", "Aaron Collier <aaron.collier@stanford.edu", "John Martin <suntzu@stanford.edu>"]
 license = "Apache2"
