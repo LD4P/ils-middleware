@@ -188,14 +188,14 @@ uvloop = ["uvloop (>=0.18)"]
 
 [[package]]
 name = "alembic"
-version = "1.18.0"
+version = "1.18.1"
 description = "A database migration tool for SQLAlchemy."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "alembic-1.18.0-py3-none-any.whl", hash = "sha256:3993fcfbc371aa80cdcf13f928b7da21b1c9f783c914f03c3c6375f58efd9250"},
-    {file = "alembic-1.18.0.tar.gz", hash = "sha256:0c4c03c927dc54d4c56821bdcc988652f4f63bf7b9017fd9d78d63f09fd22b48"},
+    {file = "alembic-1.18.1-py3-none-any.whl", hash = "sha256:f1c3b0920b87134e851c25f1f7f236d8a332c34b75416802d06971df5d1b7810"},
+    {file = "alembic-1.18.1.tar.gz", hash = "sha256:83ac6b81359596816fb3b893099841a0862f2117b2963258e965d70dc62fb866"},
 ]
 
 [package.dependencies]
@@ -502,14 +502,14 @@ ssh = ["apache-airflow-providers-ssh"]
 
 [[package]]
 name = "apache-airflow-providers-common-compat"
-version = "1.11.0"
+version = "1.12.0"
 description = "Provider package apache-airflow-providers-common-compat for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_common_compat-1.11.0-py3-none-any.whl", hash = "sha256:17bb5fb214b7ed424402b405126e9dae20706088947e344fbce40f5aae857cac"},
-    {file = "apache_airflow_providers_common_compat-1.11.0.tar.gz", hash = "sha256:614c74c61688f3263e2e936b29f3878f993aea876f6256f2b1726b67633f1dd3"},
+    {file = "apache_airflow_providers_common_compat-1.12.0-py3-none-any.whl", hash = "sha256:009274ead750ba0a11d94f33a3ee73fa736da4d1766f9dcc9805dc638f3ca33c"},
+    {file = "apache_airflow_providers_common_compat-1.12.0.tar.gz", hash = "sha256:32dc86d81330e2755dbb7bf18dcd3bd92bb9e745269eaad82e3e227f9be0097d"},
 ]
 
 [package.dependencies]
@@ -522,38 +522,38 @@ standard = ["apache-airflow-providers-standard"]
 
 [[package]]
 name = "apache-airflow-providers-common-io"
-version = "1.7.0"
+version = "1.7.1"
 description = "Provider package apache-airflow-providers-common-io for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_common_io-1.7.0-py3-none-any.whl", hash = "sha256:7bf1aa2c8a98f4951c3f97aefd588e6a88dcc65338e4b56da91a2a539564eea6"},
-    {file = "apache_airflow_providers_common_io-1.7.0.tar.gz", hash = "sha256:2b507388aef53ec2b9bd1feb577e3bd6fd89d8495607b498ecc9fe71c02f9e75"},
+    {file = "apache_airflow_providers_common_io-1.7.1-py3-none-any.whl", hash = "sha256:01ecac29f0a899ff66d0bc77653903d0c07a28dd1c4a0b56341fbdca03c631bb"},
+    {file = "apache_airflow_providers_common_io-1.7.1.tar.gz", hash = "sha256:f6a1063439b694b0b2188663645205c711fb02880baa9e262e0ccad8c3a4800b"},
 ]
 
 [package.dependencies]
 apache-airflow = ">=2.11.0"
+apache-airflow-providers-common-compat = ">=1.12.0"
 
 [package.extras]
-common-compat = ["apache-airflow-providers-common-compat"]
 openlineage = ["apache-airflow-providers-openlineage"]
 
 [[package]]
 name = "apache-airflow-providers-common-sql"
-version = "1.30.2"
+version = "1.30.3"
 description = "Provider package apache-airflow-providers-common-sql for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_common_sql-1.30.2-py3-none-any.whl", hash = "sha256:1f8c1058adb0a4224ba8d788d9b029475aaf65d8fef6251de42e65ff0a03c578"},
-    {file = "apache_airflow_providers_common_sql-1.30.2.tar.gz", hash = "sha256:a501ca6e949c8cd3eb8d55b3a1d266e8e9eb0cbb00a0bd8dc0416e75eba98b7b"},
+    {file = "apache_airflow_providers_common_sql-1.30.3-py3-none-any.whl", hash = "sha256:862b50a9b32eb28635e938c53088c78b8270f7a2845ef94c06e025cd33db1788"},
+    {file = "apache_airflow_providers_common_sql-1.30.3.tar.gz", hash = "sha256:91a301d906e05e2409d834b547822545025cbc2773e763df5546147fd48ec94f"},
 ]
 
 [package.dependencies]
 apache-airflow = ">=2.11.0"
-apache-airflow-providers-common-compat = ">=1.11.0"
+apache-airflow-providers-common-compat = ">=1.12.0"
 methodtools = ">=0.4.7"
 more-itertools = ">=9.0.0"
 sqlparse = ">=0.5.1"
@@ -562,6 +562,7 @@ sqlparse = ">=0.5.1"
 openlineage = ["apache-airflow-providers-openlineage"]
 pandas = ["pandas (>=2.2.3)", "pandas[sql-other] (>=2.1.2)"]
 polars = ["polars (>=1.26.0)"]
+sqlalchemy = ["sqlalchemy (>=1.4.49)"]
 
 [[package]]
 name = "apache-airflow-providers-fab"
@@ -589,14 +590,14 @@ kerberos = ["kerberos (>=1.3.0)"]
 
 [[package]]
 name = "apache-airflow-providers-ftp"
-version = "3.14.0"
+version = "3.14.1"
 description = "Provider package apache-airflow-providers-ftp for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_ftp-3.14.0-py3-none-any.whl", hash = "sha256:d2ba7a9c5a73a55f88da93e27f73c213aa19aca5d4483a7de5d30223321328be"},
-    {file = "apache_airflow_providers_ftp-3.14.0.tar.gz", hash = "sha256:12c35e637fb3c8e6e61b334d55fd4635c4e9e5249dc37b5df7fe1b82041fc176"},
+    {file = "apache_airflow_providers_ftp-3.14.1-py3-none-any.whl", hash = "sha256:ebc4ac5c734f20a9c28eb48f4786389ff1fd7ad69e158d2afd6df4983f50c157"},
+    {file = "apache_airflow_providers_ftp-3.14.1.tar.gz", hash = "sha256:4fe8a77116dad5b69f0bb613c6374831202fdfa93cbe6db5a51c9819bc3aa1af"},
 ]
 
 [package.dependencies]
@@ -604,58 +605,54 @@ apache-airflow = ">=2.11.0"
 apache-airflow-providers-common-compat = ">=1.8.0"
 
 [package.extras]
-common-compat = ["apache-airflow-providers-common-compat"]
 openlineage = ["apache-airflow-providers-openlineage"]
 
 [[package]]
 name = "apache-airflow-providers-http"
-version = "5.6.2"
+version = "5.6.3"
 description = "Provider package apache-airflow-providers-http for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_http-5.6.2-py3-none-any.whl", hash = "sha256:c8063b7ddc4af94f1f11dc7e0cfcdb1fa7367e7267ad7be36807b4b7f21cfbda"},
-    {file = "apache_airflow_providers_http-5.6.2.tar.gz", hash = "sha256:0978295a2fade7386a2cda80d524f74366a3faf36530aa08665250de650b2f24"},
+    {file = "apache_airflow_providers_http-5.6.3-py3-none-any.whl", hash = "sha256:c18d8d237c0816ff86561ea9528bdb26b2ed826979923da66713ebdc4ba44322"},
+    {file = "apache_airflow_providers_http-5.6.3.tar.gz", hash = "sha256:95c805cdcc500828f4f202bd6d6e32153c45d4b4bfa2a3f58ad2f68413aac0e3"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.12.14"
 apache-airflow = ">=2.11.0"
-apache-airflow-providers-common-compat = ">=1.10.1"
+apache-airflow-providers-common-compat = ">=1.12.0"
 asgiref = ">=2.3.0"
 requests = ">=2.32.0,<3"
 requests-toolbelt = ">=1.0.0"
 
-[package.extras]
-common-compat = ["apache-airflow-providers-common-compat"]
-
 [[package]]
 name = "apache-airflow-providers-imap"
-version = "3.10.2"
+version = "3.10.3"
 description = "Provider package apache-airflow-providers-imap for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_imap-3.10.2-py3-none-any.whl", hash = "sha256:2b695c0b6bc27aae7f16ff3f5fc6b8462dde542e71084ee9ca4b4663460954e7"},
-    {file = "apache_airflow_providers_imap-3.10.2.tar.gz", hash = "sha256:073be9efc4135ba3f7cdcab9257b00b733be642d38764bd69ffed10649456cb6"},
+    {file = "apache_airflow_providers_imap-3.10.3-py3-none-any.whl", hash = "sha256:d7dcd4f0186f677e1bdf03de5d7fc034ace70736c0a0c6151d32e8ef80ba3243"},
+    {file = "apache_airflow_providers_imap-3.10.3.tar.gz", hash = "sha256:44ca75f56aa8050b1f145c3def953f2fbb75e5b3c0720d93451dfe0392c91bfd"},
 ]
 
 [package.dependencies]
 apache-airflow = ">=2.11.0"
-apache-airflow-providers-common-compat = ">=1.10.1"
+apache-airflow-providers-common-compat = ">=1.12.0"
 
 [[package]]
 name = "apache-airflow-providers-smtp"
-version = "2.4.1"
+version = "2.4.2"
 description = "Provider package apache-airflow-providers-smtp for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_smtp-2.4.1-py3-none-any.whl", hash = "sha256:65db08c9b30159d0fdca6df3a78ff6a98b0478b26cd242115822d995a851fcb4"},
-    {file = "apache_airflow_providers_smtp-2.4.1.tar.gz", hash = "sha256:f28cd23e006fd384fca74d0b22ac5b9267265ee3152f12c7b6aa1165356a53f9"},
+    {file = "apache_airflow_providers_smtp-2.4.2-py3-none-any.whl", hash = "sha256:201d91efc6ae9c6a3eb6a12b395dbc047e0e2c7a8f8bb250ad17011c3fe0f6b8"},
+    {file = "apache_airflow_providers_smtp-2.4.2.tar.gz", hash = "sha256:ff234ead9ef55e5159c539be675b4c7624e252c5522b6d0bdc316349c964a38d"},
 ]
 
 [package.dependencies]
@@ -665,14 +662,14 @@ apache-airflow-providers-common-compat = ">=1.10.1"
 
 [[package]]
 name = "apache-airflow-providers-sqlite"
-version = "4.2.0"
+version = "4.2.1"
 description = "Provider package apache-airflow-providers-sqlite for Apache Airflow"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "apache_airflow_providers_sqlite-4.2.0-py3-none-any.whl", hash = "sha256:925de6140a958af26b1a72946e2aa6b4c6be77453b11f4b82b4c75f2dd238a91"},
-    {file = "apache_airflow_providers_sqlite-4.2.0.tar.gz", hash = "sha256:30fc186ef8178dcc4dbdb943f99f786f178785475f97b6a510a84f01bb1023fa"},
+    {file = "apache_airflow_providers_sqlite-4.2.1-py3-none-any.whl", hash = "sha256:4a8467ef4a712ef68586b66af27ce6b35f7f5d9d82910ffa18ff35b9fcf06853"},
+    {file = "apache_airflow_providers_sqlite-4.2.1.tar.gz", hash = "sha256:096238d43d0d97fa2271f2e994af309b0ca14bb4f8394b475ae8920d54a551e7"},
 ]
 
 [package.dependencies]
@@ -865,18 +862,18 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.42.25"
+version = "1.42.30"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "boto3-1.42.25-py3-none-any.whl", hash = "sha256:8128bde4f9d5ffce129c76d1a2efe220e3af967a2ad30bc305ba088bbc96343d"},
-    {file = "boto3-1.42.25.tar.gz", hash = "sha256:ccb5e757dd62698d25766cc54cf5c47bea43287efa59c93cf1df8c8fbc26eeda"},
+    {file = "boto3-1.42.30-py3-none-any.whl", hash = "sha256:d7e548bea65e0ae2c465c77de937bc686b591aee6a352d5a19a16bc751e591c1"},
+    {file = "boto3-1.42.30.tar.gz", hash = "sha256:ba9cd2f7819637d15bfbeb63af4c567fcc8a7dcd7b93dd12734ec58601169538"},
 ]
 
 [package.dependencies]
-botocore = ">=1.42.25,<1.43.0"
+botocore = ">=1.42.30,<1.43.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.16.0,<0.17.0"
 
@@ -885,14 +882,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.42.25"
+version = "1.42.30"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "botocore-1.42.25-py3-none-any.whl", hash = "sha256:470261966aab1d09a1cd4ba56810098834443602846559ba9504f6613dfa52dc"},
-    {file = "botocore-1.42.25.tar.gz", hash = "sha256:7ae79d1f77d3771e83e4dd46bce43166a1ba85d58a49cffe4c4a721418616054"},
+    {file = "botocore-1.42.30-py3-none-any.whl", hash = "sha256:97070a438cac92430bb7b65f8ebd7075224f4a289719da4ee293d22d1e98db02"},
+    {file = "botocore-1.42.30.tar.gz", hash = "sha256:9bf1662b8273d5cc3828a49f71ca85abf4e021011c1f0a71f41a2ea5769a5116"},
 ]
 
 [package.dependencies]
@@ -1492,14 +1489,14 @@ dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "setuptools", "tox"]
 
 [[package]]
 name = "dill"
-version = "0.4.0"
+version = "0.4.1"
 description = "serialize all of Python"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "dill-0.4.0-py3-none-any.whl", hash = "sha256:44f54bf6412c2c8464c14e8243eb163690a9800dbe2c367330883b19c7561049"},
-    {file = "dill-0.4.0.tar.gz", hash = "sha256:0633f1d2df477324f53a895b02c901fb961bdbf65a17122586ea7019292cbcf0"},
+    {file = "dill-0.4.1-py3-none-any.whl", hash = "sha256:1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d"},
+    {file = "dill-0.4.1.tar.gz", hash = "sha256:423092df4182177d4d8ba8290c8a5b640c66ab35ec7da59ccfa00f6fa3eea5fa"},
 ]
 
 [package.extras]
@@ -3738,22 +3735,22 @@ files = [
 
 [[package]]
 name = "protobuf"
-version = "6.33.3"
+version = "6.33.4"
 description = ""
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "protobuf-6.33.3-cp310-abi3-win32.whl", hash = "sha256:b4046f9f2ede57ad5b1d9917baafcbcad42f8151a73c755a1e2ec9557b0a764f"},
-    {file = "protobuf-6.33.3-cp310-abi3-win_amd64.whl", hash = "sha256:1fd18f030ae9df97712fbbb0849b6e54c63e3edd9b88d8c3bb4771f84d8db7a4"},
-    {file = "protobuf-6.33.3-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:648b7b0144222eb06cf529a3d7b01333c5f30b4196773b682d388f04db373759"},
-    {file = "protobuf-6.33.3-cp39-abi3-manylinux2014_aarch64.whl", hash = "sha256:08a6ca12f60ba99097dd3625ef4275280f99c9037990e47ce9368826b159b890"},
-    {file = "protobuf-6.33.3-cp39-abi3-manylinux2014_s390x.whl", hash = "sha256:642fce7187526c98683c79a3ad68e5d646a5ef5eb004582fe123fc9a33a9456b"},
-    {file = "protobuf-6.33.3-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:6fa9b5f4baa12257542273e5e6f3c3d3867b30bc2770c14ad9ac8315264bf986"},
-    {file = "protobuf-6.33.3-cp39-cp39-win32.whl", hash = "sha256:c46dcc47b243b299f4f7eabeed21929c07f0d36fffe2ea8431793b53c308ab80"},
-    {file = "protobuf-6.33.3-cp39-cp39-win_amd64.whl", hash = "sha256:2756963dcfd414eba46bcbb341f0e2c652036e5d700f112b3bb90fa1a031893a"},
-    {file = "protobuf-6.33.3-py3-none-any.whl", hash = "sha256:c2bf221076b0d463551efa2e1319f08d4cffcc5f0d864614ccd3d0e77a637794"},
-    {file = "protobuf-6.33.3.tar.gz", hash = "sha256:c8794debeb402963fddff41a595e1f649bcd76616ba56c835645cab4539e810e"},
+    {file = "protobuf-6.33.4-cp310-abi3-win32.whl", hash = "sha256:918966612c8232fc6c24c78e1cd89784307f5814ad7506c308ee3cf86662850d"},
+    {file = "protobuf-6.33.4-cp310-abi3-win_amd64.whl", hash = "sha256:8f11ffae31ec67fc2554c2ef891dcb561dae9a2a3ed941f9e134c2db06657dbc"},
+    {file = "protobuf-6.33.4-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:2fe67f6c014c84f655ee06f6f66213f9254b3a8b6bda6cda0ccd4232c73c06f0"},
+    {file = "protobuf-6.33.4-cp39-abi3-manylinux2014_aarch64.whl", hash = "sha256:757c978f82e74d75cba88eddec479df9b99a42b31193313b75e492c06a51764e"},
+    {file = "protobuf-6.33.4-cp39-abi3-manylinux2014_s390x.whl", hash = "sha256:c7c64f259c618f0bef7bee042075e390debbf9682334be2b67408ec7c1c09ee6"},
+    {file = "protobuf-6.33.4-cp39-abi3-manylinux2014_x86_64.whl", hash = "sha256:3df850c2f8db9934de4cf8f9152f8dc2558f49f298f37f90c517e8e5c84c30e9"},
+    {file = "protobuf-6.33.4-cp39-cp39-win32.whl", hash = "sha256:955478a89559fa4568f5a81dce77260eabc5c686f9e8366219ebd30debf06aa6"},
+    {file = "protobuf-6.33.4-cp39-cp39-win_amd64.whl", hash = "sha256:0f12ddbf96912690c3582f9dffb55530ef32015ad8e678cd494312bd78314c4f"},
+    {file = "protobuf-6.33.4-py3-none-any.whl", hash = "sha256:1fe3730068fcf2e595816a6c34fe66eeedd37d51d0400b72fabc848811fdc1bc"},
+    {file = "protobuf-6.33.4.tar.gz", hash = "sha256:dc2e61bca3b10470c1912d166fe0af67bfc20eb55971dcef8dfa48ce14f0ed91"},
 ]
 
 [[package]]
@@ -3882,14 +3879,14 @@ files = [
 
 [[package]]
 name = "pyathena"
-version = "3.24.1"
+version = "3.25.0"
 description = "Python DB API 2.0 (PEP 249) client for Amazon Athena"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pyathena-3.24.1-py3-none-any.whl", hash = "sha256:40ed172d736954b42e2aeaada591fed5a1dac2102d3915cb1b1608dcf9793e09"},
-    {file = "pyathena-3.24.1.tar.gz", hash = "sha256:279841eb49dae90b19a8242b19a0ee20c072d20d24960e1cde8956de3a613e84"},
+    {file = "pyathena-3.25.0-py3-none-any.whl", hash = "sha256:01df17f0063cfcb7ca322cfdd0385e15f3387975cbed0836897191063c1792a2"},
+    {file = "pyathena-3.25.0.tar.gz", hash = "sha256:60e735613454671353f88a9adaf647f10c1dc10da674919a0d5993392b05b7ab"},
 ]
 
 [package.dependencies]
@@ -4727,14 +4724,14 @@ files = [
 
 [[package]]
 name = "soupsieve"
-version = "2.8.1"
+version = "2.8.3"
 description = "A modern CSS selector implementation for Beautiful Soup."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "soupsieve-2.8.1-py3-none-any.whl", hash = "sha256:a11fe2a6f3d76ab3cf2de04eb339c1be5b506a8a47f2ceb6d139803177f85434"},
-    {file = "soupsieve-2.8.1.tar.gz", hash = "sha256:4cf733bc50fa805f5df4b8ef4740fc0e0fa6218cf3006269afd3f9d6d80fd350"},
+    {file = "soupsieve-2.8.3-py3-none-any.whl", hash = "sha256:ed64f2ba4eebeab06cc4962affce381647455978ffc1e36bb79a545b91f45a95"},
+    {file = "soupsieve-2.8.3.tar.gz", hash = "sha256:3267f1eeea4251fb42728b6dfb746edc9acaffc4a45b27e19450b676586e8349"},
 ]
 
 [[package]]
