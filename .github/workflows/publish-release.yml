@@ -1,0 +1,207 @@
+name: Publish Release
+
+# Run this workflow manually after the update-dependencies PR has merged.
+#
+# Required repository secrets:
+#   AWS_ACCESS_KEY_ID        — AWS credentials for S3 log cleanup and deployment
+#   AWS_SECRET_ACCESS_KEY
+#   DOCKER_USER              — Docker Hub credentials for image push
+#   DOCKER_PASS
+#
+# Required repository variables (Settings → Variables):
+#   AWS_REGION               — e.g. us-west-2
+#   S3_DEV_BUCKET            — S3 bucket name for the Sinopia API dev environment
+#   S3_STAGE_BUCKET          — S3 bucket name for the Sinopia API stage environment
+#
+# Optional: set TERRAFORM_REPO variable to <org>/<repo> to open Terraform PRs automatically.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release — leave blank to read from pyproject.toml on main'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  resolve-version:
+    name: Resolve release version
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Determine version tag
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            TAG="v${{ inputs.version }}"
+          else
+            TAG="v$(python3 -c "import tomllib; d=tomllib.load(open('pyproject.toml','rb')); print(d['tool']['poetry']['version'])")"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Releasing $TAG"
+
+  cleanup-s3-logs:
+    name: Delete S3 logs — dev and stage
+    runs-on: ubuntu-latest
+    needs: resolve-version
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Delete development logs
+        run: |
+          aws s3 rm s3://${{ vars.S3_DEV_BUCKET }}/logs/ --recursive
+          echo "Cleared logs from dev bucket: ${{ vars.S3_DEV_BUCKET }}"
+
+      - name: Delete stage logs
+        run: |
+          aws s3 rm s3://${{ vars.S3_STAGE_BUCKET }}/logs/ --recursive
+          echo "Cleared logs from stage bucket: ${{ vars.S3_STAGE_BUCKET }}"
+
+  create-github-release:
+    name: Publish GitHub release
+    runs-on: ubuntu-latest
+    needs: resolve-version
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ needs.resolve-version.outputs.tag }}" \
+            --title "${{ needs.resolve-version.outputs.tag }}" \
+            --generate-notes \
+            --latest
+          echo "Published release ${{ needs.resolve-version.outputs.tag }}"
+
+  build-docker:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    needs: [resolve-version, create-github-release]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Build and push
+        run: |
+          IMAGE="ld4p/ils-middleware"
+          TAG="${{ needs.resolve-version.outputs.tag }}"
+          docker build -t "$IMAGE:latest" -t "$IMAGE:$TAG" .
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:$TAG"
+          echo "Pushed $IMAGE:$TAG"
+
+  deploy-dev:
+    name: Deploy to development
+    runs-on: ubuntu-latest
+    needs: build-docker
+    environment: development
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy
+        run: |
+          echo "Deploying ${{ needs.build-docker.result == 'success' && needs.resolve-version.outputs.tag || 'latest' }} to development..."
+          # Replace with your deployment command, for example:
+          # aws ecs update-service --cluster sinopia-dev --service ils-middleware --force-new-deployment
+          # or: kubectl set image deployment/ils-middleware ils-middleware=ld4p/ils-middleware:$TAG
+          echo "TODO: add deployment command for dev"
+
+  deploy-stage:
+    name: Deploy to stage
+    runs-on: ubuntu-latest
+    needs: [build-docker, deploy-dev]
+    environment: stage
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy
+        run: |
+          echo "Deploying ${{ needs.resolve-version.outputs.tag }} to stage..."
+          # Replace with your deployment command, for example:
+          # aws ecs update-service --cluster sinopia-stage --service ils-middleware --force-new-deployment
+          echo "TODO: add deployment command for stage"
+
+  terraform-pr:
+    name: Open Terraform PR (if repo configured)
+    runs-on: ubuntu-latest
+    needs: resolve-version
+    if: vars.TERRAFORM_REPO != ''
+
+    steps:
+      - name: Checkout Terraform repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.TERRAFORM_REPO }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create Terraform update branch
+        run: |
+          git checkout -B "update-ils-middleware-${{ needs.resolve-version.outputs.tag }}"
+
+      - name: Update image tag in Terraform variables
+        run: |
+          # Adjust the sed command to match your Terraform variable file and variable name
+          sed -i 's|ils_middleware_image_tag\s*=\s*"[^"]*"|ils_middleware_image_tag = "${{ needs.resolve-version.outputs.tag }}"|g' \
+            terraform.tfvars 2>/dev/null || \
+          sed -i 's|ils_middleware_image_tag\s*=\s*"[^"]*"|ils_middleware_image_tag = "${{ needs.resolve-version.outputs.tag }}"|g' \
+            variables.tf 2>/dev/null || \
+          echo "Warning: could not auto-update Terraform variable — please update manually."
+
+      - name: Commit and push
+        run: |
+          git add -A
+          git diff --cached --quiet || git commit -m "Update ils-middleware to ${{ needs.resolve-version.outputs.tag }}"
+          git push origin "update-ils-middleware-${{ needs.resolve-version.outputs.tag }}" --force
+
+      - name: Create Terraform PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --repo "${{ vars.TERRAFORM_REPO }}" \
+            --title "Update ils-middleware to ${{ needs.resolve-version.outputs.tag }}" \
+            --body "Updates the ils-middleware image tag to \`${{ needs.resolve-version.outputs.tag }}\`." \
+            --base main \
+            --head "update-ils-middleware-${{ needs.resolve-version.outputs.tag }}" 2>/dev/null || true

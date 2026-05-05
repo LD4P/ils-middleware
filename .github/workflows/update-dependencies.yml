@@ -1,0 +1,136 @@
+name: Update Dependencies
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Update deps, test, and open PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Force-reset branch to main so re-runs start clean
+      - name: Create update-dependencies branch
+        run: |
+          git fetch origin
+          git checkout -B update-dependencies origin/main
+
+      - name: Bump version in pyproject.toml
+        id: version
+        run: |
+          poetry version ${{ inputs.version_bump }}
+          NEW=$(poetry version --short)
+          echo "new=$NEW" >> $GITHUB_OUTPUT
+          echo "Bumped to $NEW"
+
+      - name: Run poetry update
+        run: poetry update
+
+      - name: Install updated packages
+        run: poetry install --no-interaction
+
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "detected=false" >> $GITHUB_OUTPUT
+            echo "No dependency changes detected."
+          else
+            echo "detected=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.changes.outputs.detected == 'true'
+        run: |
+          git add pyproject.toml poetry.lock
+          git commit -m "Dependency updates to v${{ steps.version.outputs.new }}"
+
+      - name: Push branch
+        if: steps.changes.outputs.detected == 'true'
+        run: git push origin update-dependencies --force
+
+      - name: Create or update PR
+        if: steps.changes.outputs.detected == 'true'
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR; if one already exists for this branch, retrieve its number instead
+          gh pr create \
+            --title "Dependency updates to v${{ steps.version.outputs.new }}" \
+            --body "## Dependency Updates
+
+          Automated dependency update to version **${{ steps.version.outputs.new }}**.
+
+          ### What changed
+          - Version bumped to \`${{ steps.version.outputs.new }}\` via \`poetry version ${{ inputs.version_bump }}\`
+          - All packages refreshed via \`poetry update\`
+          - Test suite passed ✅
+
+          ### After this PR merges
+          Run the **Publish Release** workflow to:
+          - Clean S3 logs (dev + stage)
+          - Create GitHub release \`v${{ steps.version.outputs.new }}\`
+          - Deploy to dev and stage" \
+            --base main \
+            --head update-dependencies 2>/dev/null || true
+
+          PR_NUM=$(gh pr view update-dependencies --json number --jq '.number')
+          PR_URL=$(gh pr view update-dependencies --json url --jq '.url')
+          echo "number=$PR_NUM" >> $GITHUB_OUTPUT
+          echo "url=$PR_URL" >> $GITHUB_OUTPUT
+          echo "PR #$PR_NUM: $PR_URL"
+
+      # Requires "Allow auto-merge" enabled in repo Settings → General
+      - name: Enable auto-merge
+        if: steps.changes.outputs.detected == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge ${{ steps.pr.outputs.number }} \
+            --auto \
+            --squash \
+            --delete-branch
+          echo "Auto-merge enabled — PR will merge once all checks pass."
+
+      - name: No changes detected
+        if: steps.changes.outputs.detected == 'false'
+        run: echo "Dependencies are already up to date. No PR needed."
